@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.qna.dao.QnaDAO">
+	<resultMap id="detailResult" type="hmap">
+		<result property="CONTENT" column="CONTENT" javaType="java.lang.String" jdbcType="CLOB" />
+	</resultMap>
+	<insert id="create" parameterType="qna">
+		INSERT INTO QNA_BBS 
+			(TITLE
+			,CONTENT
+			,AUTHOR
+			,REGDATE
+			,HIT
+			,LIKES
+			,PINNED
+			,TYPE
+			,AUTHOR_EMAIL) 
+		VALUES (#{title}
+			,#{content}
+			,#{author}
+			,#{regdate}
+			,#{hit}
+			,#{likes}
+			,#{pinned}
+			,#{type}
+			,#{author_email})
+	</insert>
+	<select id="getList" statementType="CALLABLE" parameterType="hmap" resultType="hmap">
+		<![CDATA[ 
+		SELECT
+			 X.RNUM
+			 , X.ID
+			 , X.TITLE
+			 , X.AUTHOR
+			 , X.REGDATE
+			 , X.HIT
+			 , X.LIKES
+			 , X.PINNED
+			 , X.TYPE
+		FROM(
+			SELECT 
+				ROWNUM AS RNUM
+				, A.ID
+				, A.TITLE
+				, A.AUTHOR
+				, A.REGDATE
+				, A.HIT
+				, A.LIKES
+				, A.PINNED
+				, A.TYPE
+			FROM(
+				SELECT 
+					ID
+					, TITLE
+					, AUTHOR
+					, REGDATE
+					, HIT
+					, LIKES
+					, PINNED
+					, TYPE 
+				FROM QNA_BBS 
+				WHERE TYPE = #{type} 
+				AND TITLE LIKE '%' ||  #{title} || '%' 
+				AND AUTHOR LIKE '%' ||  #{author} || '%' 
+				ORDER BY REGDATE DESC
+				)A
+			WHERE ROWNUM <= #{end}
+			)X 
+		WHERE X.RNUM >= #{start}
+		]]>
+	</select>
+	<select id="getTotalNum" resultType="int">
+		SELECT COUNT(*) FROM QNA_BBS
+	</select>
+	<select id="getDetail" parameterType="long" resultMap="detailResult">
+		SELECT 
+			ID
+			,TITLE
+			,AUTHOR
+			,CONTENT
+			,REGDATE
+			,HIT
+			,LIKES
+			,TYPE
+		FROM QNA_BBS
+		WHERE ID = #{id}
+	</select>
+	<insert id="insertComment" parameterType="cmt">
+		INSERT INTO QNA_COMMENT
+			(CMT
+			,REGDATE
+			,AUTHOR_ID
+			,BBS_ID
+			,AUTHOR)
+		VALUES
+			(#{cmt}
+			,#{regdate}
+			,#{author_id}
+			,#{bbs_id}
+			,#{author})
+	</insert>
+	<select id="getComment" parameterType="long" resultType="hmap">
+		SELECT 
+			CMT
+			,REGDATE
+			,AUTHOR
+			,AUTHOR_ID
+		FROM QNA_COMMENT
+		WHERE BBS_ID = #{id} ORDER BY REGDATE
+	</select>
+</mapper>

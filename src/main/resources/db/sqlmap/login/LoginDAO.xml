@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.qna.dao.UserDAO">
+	<insert id="insertUser" parameterType="user">
+		INSERT INTO QNA_USER (EMAIL, PASSWORD, FULLNAME, ROLE) VALUES (#{email}, #{password}, #{fullname}, #{role})
+	</insert>
+	<select id="getUser" statementType="CALLABLE" parameterType="hmap" resultType="hmap">
+		SELECT * FROM QNA_USER WHERE EMAIL = #{email} AND PASSWORD = #{password}
+	</select>
+	<select id="checkUser" parameterType="String" resultType="int">
+		SELECT COUNT(*) FROM QNA_USER WHERE EMAIL = #{email}
+	</select>
+</mapper>
