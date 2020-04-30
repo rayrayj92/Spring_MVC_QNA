@@ -39,6 +39,7 @@
 	
 	<beans:bean id="loginInterceptor" class="com.spring.qna.interceptor.LoginInterceptor"></beans:bean>
 	<beans:bean id="authInterceptor" class="com.spring.qna.interceptor.AuthInterceptor"></beans:bean>
+	<beans:bean id="roleInterceptor" class="com.spring.qna.interceptor.RoleInterceptor"></beans:bean>
 	
 	<interceptors>
 		<interceptor>
@@ -47,7 +48,14 @@
 		</interceptor>
 		<interceptor>
 			<mapping path="/create" />
+			<mapping path="/edit" />
+			<mapping path="/mypage" />
+			<mapping path="/comment" />
 			<beans:ref bean="authInterceptor" />
+		</interceptor>
+		<interceptor>
+			<mapping path="/admin/**" />
+			<beans:ref bean="roleInterceptor" />
 		</interceptor>
 	</interceptors>
 	

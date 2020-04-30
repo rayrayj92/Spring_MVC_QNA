@@ -59,7 +59,7 @@ public class LoginInterceptor extends HandlerInterceptorAdapter implements Sessi
 				response.sendRedirect(attempted);
 				session.removeAttribute(ATTEMPTED);
 			} else {
-				response.sendRedirect("/qna/car?p=1");
+				response.sendRedirect("/qna/main?p=1&t=car&k=&st=");
 			}
 		}
 	}

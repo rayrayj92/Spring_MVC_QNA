@@ -29,15 +29,112 @@ public class QnaController {
 	@Autowired
 	QnaService qnaService;
 	
-	@RequestMapping(value = {"/car"}, method = RequestMethod.GET)
-	public ModelAndView carView(@RequestParam("p") int p) {
+	@RequestMapping(value = {"/mypage"}, method = RequestMethod.GET)
+	public ModelAndView mypageView(@RequestParam("p") String page,
+			@RequestParam("k") String keyword,
+			HttpServletRequest request) {
+		
+		if(keyword.equals("") || keyword == null) {
+			keyword = "%";
+		}
+		
+		ModelAndView mv = new ModelAndView("qna/mypage");
+		mv.addObject("title", "내가 쓴 글");
+		
+		ArrayList<HashMap<String, Object>> resultMap = new ArrayList<>();
+		HashMap<String, Object> inputMap = new HashMap<String, Object>();
+		
+		HttpSession session = request.getSession();
+		@SuppressWarnings("unchecked")
+		HashMap<String, Object> loginMap = (HashMap<String, Object>) session.getAttribute(SessionNames.LOGIN);
+		String author_email = (String) loginMap.get("EMAIL");
+		
+		HashMap<String, Object> totalNumMap = new HashMap<String, Object>();
+		totalNumMap.put("author_email", author_email);
+		totalNumMap.put("title", keyword);
+		
+		int totalNum = qnaService.getMyListTotalNum(totalNumMap); // 결과물의 게시물의 개수
+		int p = Integer.parseInt(page);
+		int itemPerPage = 5; // 5개씩 보여주기
+		int pageNum = totalNum / itemPerPage; // 총 몇 페이지가 필요한지 계산
+		int paginationMax = 5; // 처음 1 2 3 4 5 다음 , 
+		int startNum = p; // DB Range Start Value
+		
+
+		// 총 몇 페이지가 필요한지 계산
+		if(totalNum % itemPerPage > 0) {
+			pageNum++;
+		} else if(pageNum == 0) {
+			pageNum = 1;
+		}
+		
+		// 1,6,11,16.... 페이지의 시작번호
+		int startPage = ((p-1) / paginationMax) * paginationMax + 1;
+		
+		// 5,10,15,20.... 페이지의 끝번호
+		//int endPage = startPage + paginationMax - 1;
+		
+		// DB Range End Value
+		int lastNum = itemPerPage * p; 
+		
+		/*
+		 * 예) 만약 2번째 페이지면 6~10 사이의 게시물을 검색해야함.
+		 * 예) 2번째 페이지 = 6, 3번째 페이지 = 11 .... 
+		 * */ 
+		if(startNum > 1) {
+			startNum = (lastNum - itemPerPage) + 1;
+		}
+		/*
+		 * DB Input
+		 * */
+		inputMap.put("author_email", author_email);
+		inputMap.put("title", keyword);
+		inputMap.put("start", startNum);
+		inputMap.put("end", lastNum);
+		resultMap = (ArrayList<HashMap<String, Object>>) qnaService.getMyList(inputMap);
+		
+		/*
+		 * ModelAndView Input
+		 * */
+		mv.addObject("list", resultMap);
+		mv.addObject("start", startPage);
+		mv.addObject("last", pageNum);
+		mv.addObject("p", p); // 현재 페이지
+		mv.addObject("keyword", keyword);
+		
+		return mv;
+	}
+	
+	@RequestMapping(value = {"/main"}, method = RequestMethod.GET)
+	public ModelAndView carView(@RequestParam("p") String page, @RequestParam("t") String type
+			,@RequestParam("k") String keyword, @RequestParam("st") String searchType) {
+		
 		ModelAndView mv = new ModelAndView("qna/index");
 		mv.addObject("title", "QnA");
 		
+		String titleInput = "%", authorInput ="%";
+		
+		switch(searchType) {
+			case "title":
+				titleInput = keyword;
+				break;
+			case "author":
+				authorInput = keyword;
+				break;
+			default:
+				break;
+		}
+		
 		HashMap<String, Object> inputMap = new HashMap<String, Object>();
+		HashMap<String, Object> totalNumMap = new HashMap<String, Object>();
 		ArrayList<HashMap<String, Object>> resultMap = new ArrayList<>();
 		
-		int totalNum = qnaService.getTotalNum(); // 총 'car'의 게시물의 개수
+		totalNumMap.put("type", type);
+		totalNumMap.put("title", titleInput);
+		totalNumMap.put("author", authorInput);
+
+		int p = Integer.parseInt(page);
+		int totalNum = qnaService.getTotalNum(totalNumMap); // 결과물의 게시물의 개수
 		int itemPerPage = 5; // 5개씩 보여주기
 		int pageNum = totalNum / itemPerPage; // 총 몇 페이지가 필요한지 계산
 		int paginationMax = 5; // 처음 1 2 3 4 5 다음 , 
@@ -46,6 +143,8 @@ public class QnaController {
 		// 총 몇 페이지가 필요한지 계산
 		if(totalNum % itemPerPage > 0) {
 			pageNum++;
+		} else if(pageNum == 0) {
+			pageNum = 1;
 		}
 		
 		// 1,6,11,16.... 페이지의 시작번호
@@ -68,9 +167,9 @@ public class QnaController {
 		/*
 		 * DB Input
 		 * */
-		inputMap.put("type", "car");
-		inputMap.put("title", "%");
-		inputMap.put("author", "%");
+		inputMap.put("type", type);
+		inputMap.put("title", titleInput);
+		inputMap.put("author", authorInput);
 		inputMap.put("start", startNum);
 		inputMap.put("end", lastNum);
 		resultMap = (ArrayList<HashMap<String, Object>>) qnaService.getList(inputMap);
@@ -79,17 +178,13 @@ public class QnaController {
 		 * */
 		mv.addObject("list", resultMap);
 		mv.addObject("start", startPage);
-		mv.addObject("type", "car");
+		mv.addObject("type", type);
 		mv.addObject("last", pageNum);
 		mv.addObject("p", p); // 현재 페이지
+		mv.addObject("keyword", keyword);
+		mv.addObject("searchType", searchType);
 		
 		return mv;
-	}
-	
-	@RequestMapping(value = {"/search"}, method = RequestMethod.GET)
-	public void search(@RequestParam("s") String search,
-			@RequestParam("p") String p) {
-		log.info("p >> " + p);
 	}
 	
 	@RequestMapping(value = {"/comment"}, method = RequestMethod.POST)
@@ -111,16 +206,15 @@ public class QnaController {
 			author_id = (String) ansMap.get("EMAIL");
 			Comment comment = new Comment(cmt, date, author_id, bbs_id, author);
 			qnaService.insertComment(comment);
-			return "redirect:/detail?id=" + bbs_id;
 		}
-		// 세션값을 Interceptor로 처리를 하려니까, 에러가 발생 
-		return "redirect:/login";
+		return "redirect:/detail?id=" + bbs_id;
 	}
 	
 	@RequestMapping(value = {"/detail"}, method = RequestMethod.GET)
 	public ModelAndView detail(@RequestParam("id") long id) {
 		HashMap<String, Object> detailMap = new HashMap<String, Object>();
 		ArrayList<HashMap<String, Object>> commentMap = new ArrayList<>();
+		qnaService.updateView(id);
 		detailMap = qnaService.getDetail(id);
 		commentMap = (ArrayList<HashMap<String, Object>>) qnaService.getComment(id);
 		ModelAndView mv = new ModelAndView("qna/detail");
@@ -130,6 +224,30 @@ public class QnaController {
 		mv.addObject("commentNum", commentMap.size()); // 총 댓글 수
 		
 		return mv;
+	}
+	
+	@RequestMapping(value = {"/edit"}, method = RequestMethod.GET)
+	public ModelAndView editView(@RequestParam("id") long id) {
+		HashMap<String, Object> detailMap = new HashMap<String, Object>();
+		detailMap = qnaService.getDetail(id);
+		ModelAndView mv = new ModelAndView("qna/edit");
+		mv.addObject("title", "QnA");
+		mv.addObject("list", detailMap);
+		
+		return mv;
+	}
+	
+	@RequestMapping(value = {"/edit"}, method = RequestMethod.POST)
+	public String edit(@RequestParam("id") long id, @RequestParam("type") String type, 
+			@RequestParam("title") String title, @RequestParam("content") String content) {
+		HashMap<String, Object> editMap = new HashMap<String, Object>();
+		editMap.put("title", title);
+		editMap.put("content", content);
+		editMap.put("type", type);
+		editMap.put("id", id);
+		qnaService.updateList(editMap);
+		
+		return "redirect:/mypage?p=1&k=";
 	}
 	
 	@RequestMapping(value = {"/create"}, method = RequestMethod.GET)
@@ -147,15 +265,17 @@ public class QnaController {
 		Date regdate = new Date();
 		HttpSession session = request.getSession();
 		@SuppressWarnings("unchecked")
-		HashMap<String, Object> ansMap = (HashMap<String, Object>) session.getAttribute(SessionNames.LOGIN);
-		String author = (String) ansMap.get("FULLNAME");
-		String auth_email = (String) ansMap.get("EMAIL");
+		HashMap<String, Object> loginMap = (HashMap<String, Object>) session.getAttribute(SessionNames.LOGIN);
+		String author = (String) loginMap.get("FULLNAME");
+		String auth_email = (String) loginMap.get("EMAIL");
 		int likes = 0, pinned = 0;
 		long hit = 0;
 		
 		Qna qna = new Qna(title, content, author, regdate, hit, likes, pinned, type, auth_email);	
 		qnaService.create(qna);
 		
-		return "redirect:/car?p=1";
+		return "redirect:/main?p=1&t=car&k=&st=";
 	}
+	
+	
 }

@@ -30,6 +30,7 @@ public class AuthInterceptor extends HandlerInterceptorAdapter implements Sessio
 			session.setAttribute(ATTEMPTED, uri);
 			log.info("로그인을 하세요.");
 			response.sendRedirect("/qna/login");
+			return false;
 		}
 		
 		return true;

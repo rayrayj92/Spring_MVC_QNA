@@ -28,8 +28,8 @@ public class QnaServiceImpl implements QnaService{
 	}
 
 	@Override
-	public int getTotalNum() {
-		return qnaDAO.getTotalNum();
+	public int getTotalNum(HashMap<String, Object> inputMap) {
+		return qnaDAO.getTotalNum(inputMap);
 	}
 
 	@Override
@@ -45,6 +45,28 @@ public class QnaServiceImpl implements QnaService{
 	@Override
 	public List<HashMap<String, Object>> getComment(long id) {
 		return qnaDAO.getComment(id);
+	}
+
+	@Override
+	public void updateView(long id) {
+		qnaDAO.updateView(id);
+	}
+
+	@Override
+	public List<HashMap<String, Object>> getMyList(HashMap<String, Object> inputMap) {
+		// TODO Auto-generated method stub
+		return qnaDAO.getMyList(inputMap);
+	}
+
+	@Override
+	public int getMyListTotalNum(HashMap<String, Object> inputMap) {
+		// TODO Auto-generated method stub
+		return qnaDAO.getMyListTotalNum(inputMap);
+	}
+
+	@Override
+	public void updateList(HashMap<String, Object> inputMap) {
+		qnaDAO.updateList(inputMap);
 	}
 
 }

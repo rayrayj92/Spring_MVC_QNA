@@ -70,8 +70,13 @@
 		WHERE X.RNUM >= #{start}
 		]]>
 	</select>
-	<select id="getTotalNum" resultType="int">
-		SELECT COUNT(*) FROM QNA_BBS
+	<select id="getTotalNum" parameterType="hmap" resultType="int">
+		SELECT COUNT(*) 
+		FROM QNA_BBS 
+		WHERE 
+			TYPE = #{type} 
+			AND TITLE LIKE '%' ||  #{title} || '%' 
+			AND AUTHOR LIKE '%' ||  #{author} || '%' 
 	</select>
 	<select id="getDetail" parameterType="long" resultMap="detailResult">
 		SELECT 
@@ -86,6 +91,59 @@
 		FROM QNA_BBS
 		WHERE ID = #{id}
 	</select>
+	<select id="getMyList" parameterType="hmap" resultType="hmap">
+		<![CDATA[ 
+		SELECT
+			 X.RNUM
+			 , X.ID
+			 , X.TITLE
+			 , X.AUTHOR
+			 , X.REGDATE
+			 , X.HIT
+			 , X.LIKES
+			 , X.PINNED
+			 , X.TYPE
+		FROM(
+			SELECT 
+				ROWNUM AS RNUM
+				, A.ID
+				, A.TITLE
+				, A.AUTHOR
+				, A.REGDATE
+				, A.HIT
+				, A.LIKES
+				, A.PINNED
+				, A.TYPE
+			FROM(
+				SELECT 
+					ID
+					, TITLE
+					, AUTHOR
+					, REGDATE
+					, HIT
+					, LIKES
+					, PINNED
+					, TYPE 
+				FROM QNA_BBS 
+				WHERE AUTHOR_EMAIL = #{author_email} 
+				AND TITLE LIKE '%' ||  #{title} || '%' 
+				ORDER BY REGDATE DESC
+				)A
+			WHERE ROWNUM <= #{end}
+			)X 
+		WHERE X.RNUM >= #{start}
+		]]>
+	</select>
+	<select id="getMyListTotalNum" parameterType="hmap" resultType="int">
+		SELECT COUNT(*) 
+		FROM QNA_BBS 
+		WHERE 
+			AUTHOR_EMAIL = #{author_email} 
+			AND TITLE LIKE '%' ||  #{title} || '%' 
+	</select>
+	<update id="updateView" parameterType="long"> 
+ 		UPDATE QNA_BBS SET HIT = HIT + 1 WHERE ID = #{id}
+	</update>
 	<insert id="insertComment" parameterType="cmt">
 		INSERT INTO QNA_COMMENT
 			(CMT
@@ -109,4 +167,11 @@
 		FROM QNA_COMMENT
 		WHERE BBS_ID = #{id} ORDER BY REGDATE
 	</select>
+	<update id="updateList" parameterType="hmap">
+		UPDATE QNA_BBS SET 
+			TITLE = #{title}
+			,CONTENT = #{content}
+			,TYPE = #{type} 
+		WHERE ID = #{id}
+	</update>
 </mapper>

@@ -82,7 +82,7 @@ public class UserController {
 			return "redirect:/login";
 		}
 		
-		return "redirect:/";
+		return "redirect:/register";
 	}
 	
 	@RequestMapping(value = "/logout")

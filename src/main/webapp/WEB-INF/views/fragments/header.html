@@ -18,9 +18,9 @@
 	
 		<div class="collapse navbar-collapse" id="navbarSupportedContent">
 			<ul class="navbar-nav mr-auto">
-				<li class="nav-item"><a class="nav-link" th:href="@{/car?p=1}">자동차</a></li>
-				<li class="nav-item"><a class="nav-link" th:href="@{/fridge}">냉장고</a></li>
-				<li class="nav-item"><a class="nav-link" th:href="@{/laundry}">세탁기</a></li>
+				<li class="nav-item"><a class="nav-link" th:href="@{/main?p=1&t=car&k=&st=}">자동차</a></li>
+				<li class="nav-item"><a class="nav-link" th:href="@{/main?p=1&t=fridge&k=&st=}">냉장고</a></li>
+				<li class="nav-item"><a class="nav-link" th:href="@{/main?p=1&t=laundry&k=&st=}">세탁기</a></li>
 			</ul>
 			<ul class="navbar-nav navbar-right">
 				<li class="nav-item" th:if="${session.loginUser != null}">
@@ -38,5 +38,11 @@
 			</ul>
 		</div>
 	</nav>
+	
+	<ul class="list-group list-group-flush" th:fragment="side-nav" th:if="${session.loginUser != null}">
+		<li class="list-group-item"><a th:href="@{/mypage(p=1, k='')}">내 질문들</a></li>
+		<li class="list-group-item"><a th:href="@{/create}">질문작성</a></li>
+		<li class="list-group-item" th:if="${#strings.equals(session.loginUser.get('ROLE'), 'Admin')}"><a th:href="@{/admin/main}">관리자 페이지</a></li>
+	</ul>
 </body>
 </html>
