@@ -15,7 +15,9 @@ public class QnaFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		// TODO Auto-generated method stub
+		/**
+		 * Enable Korean
+		 * */
 		request.setCharacterEncoding("UTF-8");
 		chain.doFilter(request, response);
 	}

@@ -1,6 +1,7 @@
 package com.spring.qna.interceptor;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -38,16 +39,26 @@ public class LoginInterceptor extends HandlerInterceptorAdapter implements Sessi
 		log.info("Bean >> " + method.getBean() + ", Method >> " + method.getMethod());
 		log.info("Model >> " + modelAndView);
 		
+		/**
+		 * HashMap<String, Object> user = 
+		 * 			(HashMap<String, Object>) modelAndView.getModelMap().get("user");
+		 * "type safety unchecked cast from object" 경고
+		 *  아래 코드로 대체
+		 * */ 
 		HttpSession session = request.getSession();
+		HashMap<String, Object> user = new HashMap<String, Object>();
+		Object tmp = modelAndView.getModelMap().get("user");
+		if(tmp instanceof HashMap<?,?>) {
+			for(Map.Entry<?, ?> element : ((HashMap<?,?>) tmp).entrySet()) {
+				user.put((String)element.getKey(), element.getValue());
+			}
+		}
 		
-		@SuppressWarnings("unchecked")
-		HashMap<String, Object> user = (HashMap<String, Object>) modelAndView.getModelMap().get("user"); //HashMap<String, Object>
-		log.info("LoginInterceptor.post >> " + user);
+		log.info("LoginInterceptor User Info >> " + user);
 		
 		if(user != null) {
 			session.setAttribute(LOGIN, user);
-			
-		
+
 			Cookie loginCookie = new Cookie(LOGIN_COOKIE, session.getId());
 			loginCookie.setPath("/");
 			loginCookie.setMaxAge(7 * 24 * 60 * 60);

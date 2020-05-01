@@ -16,18 +16,17 @@ public class LoginServiceImpl implements LoginService{
 	UserDAO userDAO;
 
 	@Override
-	public void insertUser(User user) {
+	public void insertUser(User user) throws Exception {
 		userDAO.insertUser(user);
-		
 	}
 
 	@Override
-	public HashMap<String, Object> getUser(HashMap<String, Object> input) {
+	public HashMap<String, Object> getUser(HashMap<String, Object> input) throws Exception {
 		return userDAO.getUser(input);
 	}
 
 	@Override
-	public int checkUser(String email) {
+	public int checkUser(String email) throws Exception {
 		return userDAO.checkUser(email);
 	}
 

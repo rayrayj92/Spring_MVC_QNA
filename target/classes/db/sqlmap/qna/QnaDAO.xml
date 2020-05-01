@@ -142,7 +142,9 @@
 			AND TITLE LIKE '%' ||  #{title} || '%' 
 	</select>
 	<update id="updateView" parameterType="long"> 
- 		UPDATE QNA_BBS SET HIT = HIT + 1 WHERE ID = #{id}
+ 		UPDATE QNA_BBS 
+ 		SET HIT = HIT + 1 
+ 		WHERE ID = #{id}
 	</update>
 	<insert id="insertComment" parameterType="cmt">
 		INSERT INTO QNA_COMMENT
@@ -174,4 +176,50 @@
 			,TYPE = #{type} 
 		WHERE ID = #{id}
 	</update>
+	<delete id="deleteList" parameterType="java.util.List">
+		DELETE FROM QNA_BBS 
+		WHERE ID IN
+		<foreach item="ids" index="index" collection="list" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+	<select id="getPinned" resultType="hmap">
+		SELECT 
+			ID
+			, TITLE
+			, AUTHOR
+			, REGDATE
+			, HIT
+			, LIKES
+			, PINNED
+			, TYPE 
+		FROM QNA_BBS 
+		WHERE PINNED = 1
+		ORDER BY REGDATE DESC
+	</select>
+	<select id="checkLikes" parameterType="hmap" resultType="int">
+		SELECT COUNT(*)
+		FROM QNA_LIKES
+		WHERE BBS_ID = #{bbs_id} AND USER_ID = #{user_id}
+	</select>
+	<insert id="insertLikes" parameterType="hmap">
+		INSERT INTO QNA_LIKES
+			(BBS_ID
+			, USER_ID)
+		VALUES
+			(#{bbs_id}
+			, #{user_id})
+	</insert>
+	<update id="updateBbsLikes" parameterType="hmap">
+		<selectKey keyProperty="cnt" resultType="int" order="BEFORE">
+			SELECT COUNT(*) FROM QNA_LIKES WHERE BBS_ID = #{bbs_id}
+		</selectKey>
+		UPDATE QNA_BBS
+		SET LIKES = #{cnt}
+		WHERE ID = #{id}
+	</update>
+	<delete id="deleteLikes" parameterType="hmap">
+		DELETE FROM QNA_LIKES
+		WHERE BBS_ID = #{bbs_id} AND USER_ID = #{user_id}
+	</delete>
 </mapper>

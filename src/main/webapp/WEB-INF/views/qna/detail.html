@@ -11,6 +11,7 @@
 			<div class="col-8">
 				<div>
 					<span th:text="${list.get('TITLE')}" style="font-size: 1.5rem; font-weight: 600;"></span>
+					<span th:text="'좋아요: ' + ${list.get('LIKES')}" style="float: right;"></span>
 				</div>
 				<hr />
 				<div>
@@ -21,6 +22,12 @@
 				<div style="height: 300px;" th:utext="${list.get('CONTENT')}">
 					
 				</div>
+				<hr />
+				<form action="likes" method="POST">
+					<input type="hidden" name="bbs_id" th:value="${list.get('ID')}" />
+					<input type="hidden" name="user_id" th:value="${session.loginUser.get('ID')}" />
+					<input type="submit" class="btn btn-outline-danger btn-block" value="좋아요" />
+				</form>
 				<hr />
 				<div>
 					<label class="control-lable">댓글(<span th:text="${commentNum}"></span>)</label>

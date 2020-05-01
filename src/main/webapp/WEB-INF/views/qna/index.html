@@ -23,18 +23,18 @@
 				<table class="table table-striped">
 					<thead class="thead-dark">
 						<tr>
-							<th scope="col" style="width:40%;">제목 (Pinned)</th>
+							<th scope="col" style="width:40%;">공지사항 (Pinned)</th>
 							<th scope="col" style="width:10%;">작성자</th>
 							<th scope="col" style="width:15%;">날짜</th>
 							<th scope="col" style="width:15%;">조회수</th>
 						</tr>
 					</thead>
 					<tbody >
-						<tr>
-							<td class="table-info"><a href="#"></a></td>
-							<td class="table-info"><a href="#"></a></td>
-							<td class="table-info"><a href="#"></a></td>
-							<td class="table-info"><a href="#"></a></td>
+						<tr th:each="pin : ${pinned}">
+				 			<td><a th:href="@{/detail(id=${pin.get('ID')})}" th:text="${pin.get('TITLE')}"></a></td>
+				 			<td th:text="${pin.get('AUTHOR')}"></td>
+				 			<td th:text="${#dates.format(pin.get('REGDATE'), 'yyyy-MM-dd')}"></td>
+				 			<td th:text="${#numbers.formatInteger(pin.get('HIT'), 0, 'COMMA')}"></td>
 						</tr>
 					</tbody>
 				</table>

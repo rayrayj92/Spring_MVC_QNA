@@ -16,30 +16,36 @@
 					<button class="btn btn-outline-success" type="submit">검색</button>
 				</form>
 				<hr />
-				<table class="table table-striped">
-				  <thead class="thead-light">
-				    <tr>
-				      <th scope="col" style="width:5%;"></th>
-				      <th scope="col" style="width:35%;">제목</th>
-				      <th scope="col" style="width:10%;">작성자</th>
-				      <th scope="col" style="width:15%;">날짜</th>
-				      <th scope="col" style="width:15%;">조회수</th>
-				      <th scope="col" style="width:20%;">기능</th>
-				    </tr>
-				  </thead>
-				  <tbody>
-			 		<tr th:each="qna : ${list}">
-			 			<td><input type="checkbox" name="del-id" th:value="${qna.get('ID')}"></td>
-			 			<td><a th:href="@{/detail(id=${qna.get('ID')})}" th:text="${qna.get('TITLE')}"></a></td>
-			 			<td th:text="${qna.get('AUTHOR')}"></td>
-			 			<td th:text="${#dates.format(qna.get('REGDATE'), 'yyyy-MM-dd')}"></td>
-			 			<td th:text="${#numbers.formatInteger(qna.get('HIT'), 0, 'COMMA')}"></td>
-			 			<td>
-			 				<a th:href="@{/edit(id=${qna.get('ID')})}">수정</a>
-			 			</td>
-					</tr>
-				  </tbody>
-				</table>
+				<form action="delete" method="POST">
+					<table class="table table-striped">
+					  <thead class="thead-light">
+					    <tr>
+					      <th scope="col" style="width:5%;"></th>
+					      <th scope="col" style="width:35%;">제목</th>
+					      <th scope="col" style="width:10%;">작성자</th>
+					      <th scope="col" style="width:15%;">날짜</th>
+					      <th scope="col" style="width:10%;">조회수</th>
+					      <th scope="col" style="width:10%;">기능</th>
+					    </tr>
+					  </thead>
+					  <tbody>
+				 		<tr th:each="qna : ${list}">
+				 			<td><input type="checkbox" name="del-id" th:value="${qna.get('ID')}"></td>
+				 			<td><a th:href="@{/detail(id=${qna.get('ID')})}" th:text="${qna.get('TITLE')}"></a></td>
+				 			<td th:text="${qna.get('AUTHOR')}"></td>
+				 			<td th:text="${#dates.format(qna.get('REGDATE'), 'yyyy-MM-dd')}"></td>
+				 			<td th:text="${#numbers.formatInteger(qna.get('HIT'), 0, 'COMMA')}"></td>
+				 			<td>
+				 				<a th:href="@{/edit(id=${qna.get('ID')})}">수정</a>
+				 				<a th:href="@{/admin/pinned(id=${qna.get('ID')})}" th:if="${#strings.equals(session.loginUser.get('ROLE'), 'Admin')}">Pinned</a>
+				 			</td>
+						</tr>
+					  </tbody>
+					</table>
+				<div class="form-group">
+					<input type="submit" value="일괄삭제" class="btn btn-danger" />
+				</div>
+				</form>
 				<nav>
 				  <ul class="pagination" style="justify-content: center;">
 				    <li class="page-item"><a class="page-link" th:href="@{/mypage(p=1,k=${keyword})}">&laquo;</a></li>

@@ -33,7 +33,7 @@ public class UserController {
 	private static final Logger log = LoggerFactory.getLogger(UserController.class);
 	
 	@RequestMapping(value = {"/login"}, method = RequestMethod.GET)
-	public ModelAndView loginView() {
+	public ModelAndView loginView() throws Exception{
 		ModelAndView mv = new ModelAndView("login/login");
 		mv.addObject("title", "로그인");
 		return mv;
@@ -41,7 +41,7 @@ public class UserController {
 	
 	@RequestMapping(value = {"/loginPost"}, method = RequestMethod.POST)
 	public String login(@RequestParam("email") String email, 
-			@RequestParam("password") String password, HttpServletRequest request, Model model) {
+			@RequestParam("password") String password, HttpServletRequest request, Model model) throws Exception {
 		
 		HashMap<String, Object> inputMap = new HashMap<String, Object>();
 		HashMap<String, Object> resultMap = new HashMap<String, Object>();
@@ -62,7 +62,7 @@ public class UserController {
 	}
 	
 	@RequestMapping(value = {"/register"}, method = RequestMethod.GET)
-	public ModelAndView registerView() {
+	public ModelAndView registerView() throws Exception {
 		ModelAndView mv = new ModelAndView("login/register");
 		mv.addObject("title", "회원가입");
 		return mv;
@@ -70,7 +70,7 @@ public class UserController {
 	
 	@RequestMapping(value = {"/register"}, method = RequestMethod.POST)
 	public String register(@RequestParam("email") String email, @RequestParam("fullname") String fullname, 
-			@RequestParam("password") String password) {
+			@RequestParam("password") String password) throws Exception {
 		
 		String regx_email = "\\w+@\\w+\\.\\w+(\\.\\w+)?";
 		boolean result = Pattern.matches(regx_email, email);
@@ -86,7 +86,7 @@ public class UserController {
 	}
 	
 	@RequestMapping(value = "/logout")
-	public String Logout(HttpServletRequest request, HttpServletResponse response){
+	public String Logout(HttpServletRequest request, HttpServletResponse response) throws Exception{
 		HttpSession session = request.getSession(false);
 		
 		if(session != null) {
@@ -110,7 +110,7 @@ public class UserController {
 	
 	@RequestMapping(value = "/register/check", method = RequestMethod.GET)
 	@ResponseBody
-	public String emailCheck(@RequestParam("email") String email) {
+	public String emailCheck(@RequestParam("email") String email) throws Exception{
 		int tmp = loginService.checkUser(email);
 		String ans = Integer.toString(tmp);
 		return ans;

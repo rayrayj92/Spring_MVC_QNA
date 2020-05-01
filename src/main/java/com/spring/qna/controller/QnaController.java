@@ -3,6 +3,8 @@ package com.spring.qna.controller;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -32,21 +34,33 @@ public class QnaController {
 	@RequestMapping(value = {"/mypage"}, method = RequestMethod.GET)
 	public ModelAndView mypageView(@RequestParam("p") String page,
 			@RequestParam("k") String keyword,
-			HttpServletRequest request) {
-		
-		if(keyword.equals("") || keyword == null) {
-			keyword = "%";
-		}
-		
-		ModelAndView mv = new ModelAndView("qna/mypage");
-		mv.addObject("title", "내가 쓴 글");
+			HttpServletRequest request) throws Exception {
 		
 		ArrayList<HashMap<String, Object>> resultMap = new ArrayList<>();
 		HashMap<String, Object> inputMap = new HashMap<String, Object>();
 		
+		ModelAndView mv = new ModelAndView("qna/mypage");
+		mv.addObject("title", "내가 쓴 글");
+		
+		if(keyword.equals("") || keyword == null) {
+			keyword = "%";
+		}
+
+		/**
+		 * HashMap<String, Object> loginMap = 
+		 * 			(HashMap<String, Object>) session.getAttribute(LOGIN);
+		 * "type safety unchecked cast from object" 경고
+		 *  아래 코드로 대체
+		 * */
 		HttpSession session = request.getSession();
-		@SuppressWarnings("unchecked")
-		HashMap<String, Object> loginMap = (HashMap<String, Object>) session.getAttribute(SessionNames.LOGIN);
+		HashMap<String, Object> loginMap = new HashMap<String, Object>();
+		Object tmp = session.getAttribute(SessionNames.LOGIN);
+		if(tmp instanceof HashMap<?,?>) {
+			for(Map.Entry<?, ?> element : ((HashMap<?,?>) tmp).entrySet()) {
+				loginMap.put((String)element.getKey(), element.getValue());
+			}
+		}
+		
 		String author_email = (String) loginMap.get("EMAIL");
 		
 		HashMap<String, Object> totalNumMap = new HashMap<String, Object>();
@@ -106,8 +120,8 @@ public class QnaController {
 	}
 	
 	@RequestMapping(value = {"/main"}, method = RequestMethod.GET)
-	public ModelAndView carView(@RequestParam("p") String page, @RequestParam("t") String type
-			,@RequestParam("k") String keyword, @RequestParam("st") String searchType) {
+	public ModelAndView mainView(@RequestParam("p") String page, @RequestParam("t") String type
+			,@RequestParam("k") String keyword, @RequestParam("st") String searchType) throws Exception {
 		
 		ModelAndView mv = new ModelAndView("qna/index");
 		mv.addObject("title", "QnA");
@@ -127,7 +141,10 @@ public class QnaController {
 		
 		HashMap<String, Object> inputMap = new HashMap<String, Object>();
 		HashMap<String, Object> totalNumMap = new HashMap<String, Object>();
+		// 질문 리스트
 		ArrayList<HashMap<String, Object>> resultMap = new ArrayList<>();
+		// 공지사항 리스트
+		ArrayList<HashMap<String, Object>> pinnedMap = new ArrayList<>();
 		
 		totalNumMap.put("type", type);
 		totalNumMap.put("title", titleInput);
@@ -173,9 +190,11 @@ public class QnaController {
 		inputMap.put("start", startNum);
 		inputMap.put("end", lastNum);
 		resultMap = (ArrayList<HashMap<String, Object>>) qnaService.getList(inputMap);
+		pinnedMap = (ArrayList<HashMap<String, Object>>) qnaService.getPinned();
 		/*
 		 * ModelAndView Input
 		 * */
+		mv.addObject("pinned", pinnedMap);
 		mv.addObject("list", resultMap);
 		mv.addObject("start", startPage);
 		mv.addObject("type", type);
@@ -190,20 +209,33 @@ public class QnaController {
 	@RequestMapping(value = {"/comment"}, method = RequestMethod.POST)
 	public String comment(@RequestParam("comment") String cmt, 
 			@RequestParam("id") String id,
-			HttpServletRequest request) {
+			HttpServletRequest request) throws Exception {
 		
 		long bbs_id = Long.parseLong(id);
 		Date date = new Date();
+		
+		/**
+		 * HashMap<String, Object> loginMap = 
+		 * 			(HashMap<String, Object>) session.getAttribute(LOGIN);
+		 * "type safety unchecked cast from object" 경고
+		 *  아래 코드로 대체
+		 * */
 		HttpSession session = request.getSession();
-		@SuppressWarnings("unchecked")
-		HashMap<String, Object> ansMap = (HashMap<String, Object>) session.getAttribute(SessionNames.LOGIN);
+		HashMap<String, Object> loginMap = new HashMap<String, Object>();
+		Object tmp = session.getAttribute(SessionNames.LOGIN);
+		if(tmp instanceof HashMap<?,?>) {
+			for(Map.Entry<?, ?> element : ((HashMap<?,?>) tmp).entrySet()) {
+				loginMap.put((String)element.getKey(), element.getValue());
+			}
+		}
+		
 		String author_id = "";
 		String author = "";
 		
 		//세션 값이 null이 아니면 로그인이 되어 있는 상태
-		if(ansMap != null) {
-			author = (String) ansMap.get("FULLNAME");
-			author_id = (String) ansMap.get("EMAIL");
+		if(loginMap != null) {
+			author = (String) loginMap.get("FULLNAME");
+			author_id = (String) loginMap.get("EMAIL");
 			Comment comment = new Comment(cmt, date, author_id, bbs_id, author);
 			qnaService.insertComment(comment);
 		}
@@ -211,7 +243,7 @@ public class QnaController {
 	}
 	
 	@RequestMapping(value = {"/detail"}, method = RequestMethod.GET)
-	public ModelAndView detail(@RequestParam("id") long id) {
+	public ModelAndView detail(@RequestParam("id") long id) throws Exception {
 		HashMap<String, Object> detailMap = new HashMap<String, Object>();
 		ArrayList<HashMap<String, Object>> commentMap = new ArrayList<>();
 		qnaService.updateView(id);
@@ -227,7 +259,7 @@ public class QnaController {
 	}
 	
 	@RequestMapping(value = {"/edit"}, method = RequestMethod.GET)
-	public ModelAndView editView(@RequestParam("id") long id) {
+	public ModelAndView editView(@RequestParam("id") long id) throws Exception {
 		HashMap<String, Object> detailMap = new HashMap<String, Object>();
 		detailMap = qnaService.getDetail(id);
 		ModelAndView mv = new ModelAndView("qna/edit");
@@ -239,7 +271,7 @@ public class QnaController {
 	
 	@RequestMapping(value = {"/edit"}, method = RequestMethod.POST)
 	public String edit(@RequestParam("id") long id, @RequestParam("type") String type, 
-			@RequestParam("title") String title, @RequestParam("content") String content) {
+			@RequestParam("title") String title, @RequestParam("content") String content) throws Exception {
 		HashMap<String, Object> editMap = new HashMap<String, Object>();
 		editMap.put("title", title);
 		editMap.put("content", content);
@@ -251,7 +283,7 @@ public class QnaController {
 	}
 	
 	@RequestMapping(value = {"/create"}, method = RequestMethod.GET)
-	public ModelAndView createView() {
+	public ModelAndView createView() throws Exception {
 		ModelAndView mv = new ModelAndView("qna/create");
 		mv.addObject("title", "질문 작성");
 		return mv;
@@ -260,12 +292,25 @@ public class QnaController {
 	@RequestMapping(value = {"/create"}, method = RequestMethod.POST)
 	public String create(@RequestParam("type") String type, 
 			@RequestParam("title") String title,
-			@RequestParam("content") String content, HttpServletRequest request) {
+			@RequestParam("content") String content, HttpServletRequest request) throws Exception {
 		
 		Date regdate = new Date();
+		
+		/**
+		 * HashMap<String, Object> loginMap = 
+		 * 			(HashMap<String, Object>) session.getAttribute(LOGIN);
+		 * "type safety unchecked cast from object" 경고
+		 *  아래 코드로 대체
+		 * */
 		HttpSession session = request.getSession();
-		@SuppressWarnings("unchecked")
-		HashMap<String, Object> loginMap = (HashMap<String, Object>) session.getAttribute(SessionNames.LOGIN);
+		HashMap<String, Object> loginMap = new HashMap<String, Object>();
+		Object tmp = session.getAttribute(SessionNames.LOGIN);
+		if(tmp instanceof HashMap<?,?>) {
+			for(Map.Entry<?, ?> element : ((HashMap<?,?>) tmp).entrySet()) {
+				loginMap.put((String)element.getKey(), element.getValue());
+			}
+		}
+		
 		String author = (String) loginMap.get("FULLNAME");
 		String auth_email = (String) loginMap.get("EMAIL");
 		int likes = 0, pinned = 0;
@@ -277,5 +322,47 @@ public class QnaController {
 		return "redirect:/main?p=1&t=car&k=&st=";
 	}
 	
+	@RequestMapping(value = {"/delete"}, method = RequestMethod.POST)
+	public String delete(@RequestParam("del-id") long[] ids) throws Exception {
+		
+		if(ids.length == 0){
+			return "redirect:/mypage?p=1&k=";
+		}
+		List<Long> list = new ArrayList<Long>();
+		
+		for(long i: ids){
+			list.add(i);
+		}
+		
+		qnaService.deleteList(list);
+		log.info("Delete Success");
+		
+		return "redirect:/mypage?p=1&k=";
+	}
 	
+	@RequestMapping(value = {"/likes"}, method = RequestMethod.POST)
+	public String likes(@RequestParam("bbs_id") long bbs_id, 
+			@RequestParam("user_id") long user_id) throws Exception {
+		
+		HashMap<String, Object> updateMap = new HashMap<String, Object>();
+		updateMap.put("bbs_id", bbs_id);
+		updateMap.put("id", bbs_id);
+		
+		HashMap<String, Object> inputMap = new HashMap<String, Object>();
+		inputMap.put("bbs_id", bbs_id);
+		inputMap.put("user_id", user_id);
+		int ans = qnaService.checkLikes(inputMap);
+		
+		if(ans == 0) {
+			qnaService.insertLikes(inputMap);
+			qnaService.updateBbsLikes(updateMap);
+			log.info("Likes Implemented");
+		} else {
+			qnaService.deleteLikes(inputMap);
+			qnaService.updateBbsLikes(updateMap);
+			log.info("UnLikes Implemented");
+		}
+
+		return "redirect:/detail?id="+bbs_id;
+	}
 }
