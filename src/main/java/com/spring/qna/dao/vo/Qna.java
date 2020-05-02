@@ -13,6 +13,10 @@ public class Qna {
 	private int pinned;
 	private String type;
 	private String author_email;
+	
+	public Qna() {
+		// TODO Auto-generated constructor stub
+	}
 
 	public Qna(long id, String title, String content, String author, Date regdate, long hit, int likes, int pinned,
 			String type, String author_email) {

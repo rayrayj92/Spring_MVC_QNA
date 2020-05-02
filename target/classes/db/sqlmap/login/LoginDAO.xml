@@ -5,8 +5,14 @@
 	<insert id="insertUser" parameterType="user">
 		INSERT INTO QNA_USER (EMAIL, PASSWORD, FULLNAME, ROLE) VALUES (#{email}, #{password}, #{fullname}, #{role})
 	</insert>
-	<select id="getUser" statementType="CALLABLE" parameterType="hmap" resultType="hmap">
-		SELECT * FROM QNA_USER WHERE EMAIL = #{email} AND PASSWORD = #{password}
+	<select id="getUser" statementType="CALLABLE" parameterType="string" resultType="hmap">
+		SELECT ID
+			,EMAIL
+			,PASSWORD
+			,FULLNAME
+			,ROLE
+		FROM QNA_USER 
+		WHERE EMAIL = #{email}
 	</select>
 	<select id="checkUser" parameterType="String" resultType="int">
 		SELECT COUNT(*) FROM QNA_USER WHERE EMAIL = #{email}

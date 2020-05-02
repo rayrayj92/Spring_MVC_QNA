@@ -54,4 +54,7 @@ public interface QnaDAO {
 	
 	// 좋아요 취소
 	public void deleteLikes(HashMap<String, Object> inputMap) throws Exception;
+	
+	// 댓글 삭제
+	public void deleteComment(long id) throws Exception;
 }

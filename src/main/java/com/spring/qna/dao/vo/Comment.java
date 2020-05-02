@@ -6,14 +6,14 @@ public class Comment {
 	private long id;
 	private String cmt;
 	private Date regdate;
-	private String author_id;
+	private String author_email;
 	private long bbs_id;
 	private String author;
 	
-	public Comment(String cmt, Date regdate, String author_id, long bbs_id, String author) {
+	public Comment(String cmt, Date regdate, String author_email, long bbs_id, String author) {
 		this.cmt = cmt;
 		this.regdate = regdate;
-		this.author_id = author_id;
+		this.author_email = author_email;
 		this.bbs_id = bbs_id;
 		this.author = author;
 	}
@@ -42,12 +42,12 @@ public class Comment {
 		this.regdate = regdate;
 	}
 
-	public String getAuthor_id() {
-		return author_id;
+	public String getAuthor_email() {
+		return author_email;
 	}
 
-	public void setAuthor_id(String author_id) {
-		this.author_id = author_id;
+	public void setAuthor_email(String author_email) {
+		this.author_email = author_email;
 	}
 
 	public long getBbs_id() {

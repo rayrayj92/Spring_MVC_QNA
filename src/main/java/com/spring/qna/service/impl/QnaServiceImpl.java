@@ -99,4 +99,9 @@ public class QnaServiceImpl implements QnaService{
 		qnaDAO.deleteLikes(inputMap);
 	}
 
+	@Override
+	public void deleteComment(long id) throws Exception {
+		qnaDAO.deleteComment(id);
+	}
+
 }

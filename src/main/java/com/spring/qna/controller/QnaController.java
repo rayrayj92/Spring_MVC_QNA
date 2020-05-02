@@ -1,5 +1,6 @@
 package com.spring.qna.controller;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -229,23 +230,46 @@ public class QnaController {
 			}
 		}
 		
-		String author_id = "";
+		String author_email = "";
 		String author = "";
 		
 		//세션 값이 null이 아니면 로그인이 되어 있는 상태
 		if(loginMap != null) {
 			author = (String) loginMap.get("FULLNAME");
-			author_id = (String) loginMap.get("EMAIL");
-			Comment comment = new Comment(cmt, date, author_id, bbs_id, author);
+			author_email = (String) loginMap.get("EMAIL");
+			Comment comment = new Comment(cmt, date, author_email, bbs_id, author);
 			qnaService.insertComment(comment);
 		}
 		return "redirect:/detail?id=" + bbs_id;
 	}
 	
 	@RequestMapping(value = {"/detail"}, method = RequestMethod.GET)
-	public ModelAndView detail(@RequestParam("id") long id) throws Exception {
+	public ModelAndView detail(@RequestParam("id") long id, HttpServletRequest request) throws Exception {
 		HashMap<String, Object> detailMap = new HashMap<String, Object>();
 		ArrayList<HashMap<String, Object>> commentMap = new ArrayList<>();
+		String email = "";
+		BigDecimal user_id = new BigDecimal(0);
+		
+		/**
+		 * HashMap<String, Object> loginMap = 
+		 * 			(HashMap<String, Object>) session.getAttribute(LOGIN);
+		 * "type safety unchecked cast from object" 경고
+		 *  아래 코드로 대체
+		 * */
+		HttpSession session = request.getSession();
+		HashMap<String, Object> loginMap = new HashMap<String, Object>();
+		Object tmp = session.getAttribute(SessionNames.LOGIN);
+		if(tmp instanceof HashMap<?,?>) {
+			for(Map.Entry<?, ?> element : ((HashMap<?,?>) tmp).entrySet()) {
+				loginMap.put((String)element.getKey(), element.getValue());
+			}
+		}
+		
+		if(loginMap != null) {
+			email = (String) loginMap.get("EMAIL");
+			user_id = (BigDecimal) loginMap.get("ID");
+		}
+		
 		qnaService.updateView(id);
 		detailMap = qnaService.getDetail(id);
 		commentMap = (ArrayList<HashMap<String, Object>>) qnaService.getComment(id);
@@ -254,6 +278,8 @@ public class QnaController {
 		mv.addObject("list", detailMap);
 		mv.addObject("comment", commentMap);
 		mv.addObject("commentNum", commentMap.size()); // 총 댓글 수
+		mv.addObject("email", email);
+		mv.addObject("user_id", user_id);
 		
 		return mv;
 	}
@@ -361,6 +387,36 @@ public class QnaController {
 			qnaService.deleteLikes(inputMap);
 			qnaService.updateBbsLikes(updateMap);
 			log.info("UnLikes Implemented");
+		}
+
+		return "redirect:/detail?id="+bbs_id;
+	}
+	
+	@RequestMapping(value = {"/commentDelete"}, method = RequestMethod.POST)
+	public String commentDelete(@RequestParam("id") long id, 
+			@RequestParam("bbs_id") long bbs_id, 
+			@RequestParam("author_email") String author_email,
+			HttpServletRequest request) throws Exception {
+		
+		/**
+		 * HashMap<String, Object> loginMap = 
+		 * 			(HashMap<String, Object>) session.getAttribute(LOGIN);
+		 * "type safety unchecked cast from object" 경고
+		 *  아래 코드로 대체
+		 * */
+		HttpSession session = request.getSession();
+		HashMap<String, Object> loginMap = new HashMap<String, Object>();
+		Object tmp = session.getAttribute(SessionNames.LOGIN);
+		if(tmp instanceof HashMap<?,?>) {
+			for(Map.Entry<?, ?> element : ((HashMap<?,?>) tmp).entrySet()) {
+				loginMap.put((String)element.getKey(), element.getValue());
+			}
+		}
+		
+		String session_email = (String) loginMap.get("EMAIL");
+		
+		if(session_email.equals(author_email)) {
+			qnaService.deleteComment(id);
 		}
 
 		return "redirect:/detail?id="+bbs_id;

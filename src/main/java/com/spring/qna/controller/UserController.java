@@ -3,6 +3,7 @@ package com.spring.qna.controller;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +31,9 @@ public class UserController {
 	
 	@Autowired
 	LoginService loginService;
+	
+	@Inject
+	PasswordEncoder passwordEncoder;
 	
 	private static final Logger log = LoggerFactory.getLogger(UserController.class);
 	
@@ -49,13 +54,14 @@ public class UserController {
 		inputMap.put("email", email);
 		inputMap.put("password", password);
 		
-		resultMap = loginService.getUser(inputMap);
+		resultMap = loginService.getUser(email);
+		String bcryptPassword = (String) resultMap.get("PASSWORD");
 		
-		if(resultMap == null) {
-			model.addAttribute("loginResult", "Login Fail");
-		} else {
+		if(passwordEncoder.matches(password, bcryptPassword)) {
 			model.addAttribute("loginResult", "Login Success");
 			model.addAttribute("user",resultMap);
+		} else {
+			model.addAttribute("loginResult", "Login Fail");
 		}
 		
 		return "login/loginPost";
@@ -76,7 +82,8 @@ public class UserController {
 		boolean result = Pattern.matches(regx_email, email);
 		
 		if(result && !fullname.equals("") && (password.length() >= 6)) {
-			User user = new User(email, password, fullname, "User");
+			String bcryptPassword = passwordEncoder.encode(password); // BCrypt로 해싱 암호화, 10 rounds
+			User user = new User(email, bcryptPassword, fullname, "User");
 			loginService.insertUser(user);
 			log.info(">>> Register Success <<<");
 			return "redirect:/login";

@@ -21,8 +21,8 @@ public class LoginServiceImpl implements LoginService{
 	}
 
 	@Override
-	public HashMap<String, Object> getUser(HashMap<String, Object> input) throws Exception {
-		return userDAO.getUser(input);
+	public HashMap<String, Object> getUser(String email) throws Exception {
+		return userDAO.getUser(email);
 	}
 
 	@Override
