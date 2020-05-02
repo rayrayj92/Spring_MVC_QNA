@@ -16,8 +16,8 @@ Spring Framework를 사용하여 Q&A 게시판 및 로그인 기능 구현
 ## 기능
 * 공통
     * 모든 페이지 별 세션 체크 및 이용자 ROLE 체크
-* 게시판
     * Input 값 유효성 체크[Back-End, Front-End(HTML5 Attribute)]
+* 게시판
     * 작성[위지위그 CK Editor], 조회[조회수 증가], 수정, 삭제[일괄삭제]
     * 관리자 페이지[Role 체크]
     * 좋아요, 댓글 기능
