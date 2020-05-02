@@ -17,6 +17,7 @@ Spring Framework를 사용하여 Q&A 게시판 및 로그인 기능 구현
 * 공통
     * 모든 페이지 별 세션 체크 및 이용자 ROLE 체크
     * Input 값 유효성 체크[Back-End, Front-End(HTML5 Attribute)]
+    * Interceptor 적용[Login, Role]
 * 게시판
     * 검색[제목, 작성자]
     * 게시판 페이징
@@ -27,7 +28,7 @@ Spring Framework를 사용하여 Q&A 게시판 및 로그인 기능 구현
 * 회원가입
     * 이메일 중복 체크[Ajax]
     * 비밀번호 암호화[BCrypt]
-* 로그인 [인터셉터 사용]
+* 로그인
     * 비밀번호 암호화[BCrypt]
     * 세션 타이머 값 지정
     * Input 값 유효성 체크[Back-End, Front-End(HTML5 Attribute)]
