@@ -9,7 +9,7 @@ Spring Framework를 사용하여 Q&A 게시판 및 로그인 기능 구현
 * Spring Security 5.2.3 [BCrypt Encode]
 * JUnit 4
 * Oracle XE 18c
-* MyBatis 3.3.0
+* MyBatis 3.5.4
 * Bootstrap 4.4.1
 * CK Editor 4.14.0
 
