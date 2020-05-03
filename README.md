@@ -32,7 +32,6 @@ Spring Framework를 사용하여 Q&A 게시판 및 로그인 기능 구현
 * 로그인
     * 비밀번호 암호화[BCrypt]
     * 세션 타이머 값 지정
-    * Input 값 유효성 체크[Back-End, Front-End(HTML5 Attribute)]
     * 로그아웃[세션 파괴]
 * 에러 페이지
     * 커스텀 404 및 자바 예외처리 에러 페이지
