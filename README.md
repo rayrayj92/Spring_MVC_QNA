@@ -7,6 +7,7 @@ Spring Framework를 사용하여 Q&A 게시판 및 로그인 기능 구현
 ## 기술
 * Spring Framework 5.2.5
 * Spring Security 5.2.3 [BCrypt Encode]
+* hymeleaf 3.0.11
 * JUnit 4
 * Oracle XE 18c
 * MyBatis 3.5.4
