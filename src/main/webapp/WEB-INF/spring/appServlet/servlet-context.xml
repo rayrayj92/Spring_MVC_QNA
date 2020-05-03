@@ -54,7 +54,7 @@
 			<beans:ref bean="authInterceptor" />
 		</interceptor>
 		<interceptor>
-			<mapping path="/admin/**" />
+			<mapping path="/admin/main" />
 			<beans:ref bean="roleInterceptor" />
 		</interceptor>
 	</interceptors>
