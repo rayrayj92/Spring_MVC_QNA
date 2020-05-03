@@ -43,5 +43,7 @@ Spring Framework를 사용하여 Q&A 게시판 및 로그인 기능 구현
 링크 -> https://www.youtube.com/watch?v=_PIhtKGZJoQ
     
 ## 부록
+* **DB ER Diagram**
+![설명](media/ER.png)
 * **Pinned 기능**
 ![설명](media/pinned.jpg)
