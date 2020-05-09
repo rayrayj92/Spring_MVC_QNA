@@ -227,4 +227,15 @@
 		DELETE FROM QNA_COMMENT
 		WHERE ID = #{id}
 	</delete>
+	<select id="countComment">
+		SELECT 
+			ID
+			, TITLE
+			, AUTHOR
+			, (SELECT 
+				COUNT(*)
+			   FROM QNA_COMMENT
+			   WHERE BBS_ID = QNA_BBS.ID) AS "CNT"
+		FROM QNA_BBS
+	</select>
 </mapper>
