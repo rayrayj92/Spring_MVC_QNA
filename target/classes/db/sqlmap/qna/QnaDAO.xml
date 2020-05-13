@@ -227,7 +227,7 @@
 		DELETE FROM QNA_COMMENT
 		WHERE ID = #{id}
 	</delete>
-	<select id="countComment">
+	<select id="countComment" resultType="hmap">
 		SELECT 
 			ID
 			, TITLE

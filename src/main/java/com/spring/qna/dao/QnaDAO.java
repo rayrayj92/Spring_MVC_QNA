@@ -57,4 +57,7 @@ public interface QnaDAO {
 	
 	// 댓글 삭제
 	public void deleteComment(long id) throws Exception;
+	
+	// 각 게시물 마다 댓글 총 개수 리턴
+	public List<HashMap<String, Object>> countComment() throws Exception;
 }

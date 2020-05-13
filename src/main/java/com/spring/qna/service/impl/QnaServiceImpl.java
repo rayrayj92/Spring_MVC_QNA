@@ -104,4 +104,9 @@ public class QnaServiceImpl implements QnaService{
 		qnaDAO.deleteComment(id);
 	}
 
+	@Override
+	public List<HashMap<String, Object>> countComment() throws Exception {
+		return qnaDAO.countComment();
+	}
+
 }
