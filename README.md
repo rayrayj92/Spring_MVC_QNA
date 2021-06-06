@@ -37,7 +37,7 @@ Spring Framework를 사용하여 Q&A 게시판 및 로그인 기능 구현
 * 에러 페이지
     * 커스텀 404 및 자바 예외처리 에러 페이지
 * JUnit 4
-    * 테스트 케이스[현재 진행 중]
+    * 테스트 케이스
     
 ## 데모
 링크 -> https://www.youtube.com/watch?v=_PIhtKGZJoQ
